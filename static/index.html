@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hospital Chatbot</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0c111b;
+      --panel:#0f1b2c;
+      --panel-2:#101c2f;
+      --stroke:rgba(255,255,255,0.08);
+      --text:#e9f0fa;
+      --muted:#a6b4c7;
+      --accent:#52ffc7;
+      --accent-2:#7fb4ff;
+      --danger:#ff7b8a;
+      --radius:18px;
+      --shadow:0 20px 60px rgba(0,0,0,0.35);
+    }
+    *{box-sizing:border-box;}
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:"Space Grotesk", system-ui, -apple-system, sans-serif;
+      background:radial-gradient(140% 140% at 20% 10%,rgba(82,255,199,0.18),transparent),
+                 radial-gradient(110% 110% at 85% 0%,rgba(127,180,255,0.16),transparent),
+                 radial-gradient(120% 120% at 60% 90%,rgba(255,123,138,0.12),transparent),
+                 var(--bg);
+      color:var(--text);
+      padding:28px 18px 36px;
+    }
+    .layout{
+      max-width:1200px;
+      margin:0 auto;
+      display:grid;
+      grid-template-columns:2fr 1fr;
+      gap:18px;
+    }
+    header{
+      grid-column:span 2;
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+    }
+    .eyebrow{letter-spacing:0.16em;text-transform:uppercase;color:var(--muted);font-size:11px;margin:0 0 8px;}
+    h1{margin:0 0 6px;font-size:32px;}
+    .lede{margin:0;color:var(--muted);max-width:680px;line-height:1.5;}
+    .tag{background:rgba(82,255,199,0.16);color:var(--accent);border:1px solid rgba(82,255,199,0.35);padding:8px 14px;border-radius:999px;font-weight:700;}
+    .card{
+      background:linear-gradient(145deg,var(--panel),var(--panel-2));
+      border:1px solid var(--stroke);
+      border-radius:var(--radius);
+      padding:18px;
+      box-shadow:var(--shadow);
+    }
+    .chat{
+      height:520px;
+      overflow-y:auto;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      padding:8px;
+    }
+    .bubble{
+      padding:12px 14px;
+      border-radius:14px;
+      max-width:82%;
+      line-height:1.5;
+      box-shadow:0 10px 30px rgba(0,0,0,0.2);
+      border:1px solid var(--stroke);
+    }
+    .bot{align-self:flex-start;background:rgba(82,255,199,0.08);border-color:rgba(82,255,199,0.25);} 
+    .user{align-self:flex-end;background:#1f2d45;}
+    form{
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:10px;
+      margin-top:12px;
+    }
+    input{
+      padding:13px 14px;
+      border-radius:12px;
+      border:1px solid var(--stroke);
+      background:#0d1726;
+      color:var(--text);
+    }
+    button{
+      background:linear-gradient(135deg,var(--accent),var(--accent-2));
+      border:none;
+      color:#0b1220;
+      padding:13px 18px;
+      border-radius:12px;
+      font-weight:700;
+      cursor:pointer;
+      transition:transform 120ms ease, filter 120ms ease;
+    }
+    button:active{transform:translateY(1px);filter:brightness(0.95);} 
+    .tips ul{padding-left:18px;margin:8px 0;color:var(--muted);} .tips li{margin-bottom:6px;}
+    .toolbar{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;}
+    .pill{border:1px solid var(--stroke);padding:8px 12px;border-radius:999px;color:var(--muted);cursor:pointer;background:#121d2d;transition:all 120ms ease;}
+    .pill:hover{color:var(--text);border-color:rgba(82,255,199,0.4);} 
+    .status{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:13px;margin-top:6px;}
+    .dot{width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 6px rgba(82,255,199,0.14);} 
+    .suggestions{color:var(--muted);font-size:14px;margin-top:-4px;}
+    .suggestions strong{color:var(--text);}    
+    .suggestion-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top:8px;
+      max-width:82%;
+      align-self:flex-start;
+    }
+    .suggestion-chip{
+      border:1px solid rgba(82,255,199,0.28);
+      background:rgba(82,255,199,0.08);
+      color:var(--text);
+      padding:8px 12px;
+      border-radius:999px;
+      cursor:pointer;
+      font:inherit;
+      transition:all 120ms ease;
+    }
+    .suggestion-chip:hover{
+      color:var(--text);
+      border-color:rgba(82,255,199,0.5);
+      background:rgba(82,255,199,0.14);
+    }
+    .meta{display:flex;justify-content:space-between;align-items:center;margin-top:6px;font-size:13px;color:var(--muted);}  
+    .list{margin:0;padding:0;list-style:none;display:grid;gap:8px;}
+    .list li{padding:10px 12px;border-radius:12px;background:rgba(255,255,255,0.03);border:1px solid var(--stroke);display:flex;justify-content:space-between;}
+    .label{font-weight:600;color:var(--text);} .sub{color:var(--muted);font-size:13px;}
+    .typing{font-size:13px;color:var(--muted);} 
+    @media(max-width:900px){
+      .layout{grid-template-columns:1fr;}
+      header{grid-column:span 1;flex-direction:column;align-items:flex-start;}
+      .chat{height:480px;}
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <header>
+      <div>
+        <p class="eyebrow">Reyna Hospitals</p>
+        <h1>Smart Appointment Assistant</h1>
+        <p class="lede">Book, reschedule, or ask quick questions. The bot checks live availability before confirming.</p>
+      </div>
+      <div class="tag">Beta</div>
+    </header>
+
+    <main class="card">
+      <div class="meta">
+        <span>Chat</span>
+        <span class="typing" id="typing" hidden>Typing...</span>
+      </div>
+      <section class="chat" id="chat"></section>
+      <div class="toolbar" id="quick">
+        <div class="pill" data-msg="Book me with a cardiologist on 2026-03-20 at 10:00">Quick book cardiology</div>
+        <div class="pill" data-msg="Cancel appointment 12">Cancel appointment</div>
+        <div class="pill" data-msg="I have a rash, what should I do?">Ask a health question</div>
+      </div>
+      <form id="chat-form">
+        <input id="input" type="text" placeholder="Describe symptoms or ask a question..." autocomplete="off" required />
+        <button type="submit">Send</button>
+      </form>
+      <div class="status"><span class="dot"></span><span>Connected to assistant</span></div>
+    </main>
+
+    <aside class="card tips">
+      <h3 style="margin:0 0 8px;">Today's availability</h3>
+      <ul class="list" id="doctors"></ul>
+      <p class="suggestions" id="suggestions"></p>
+    </aside>
+  </div>
+
+  <script>
+    const chatEl = document.getElementById('chat');
+    const form = document.getElementById('chat-form');
+    const input = document.getElementById('input');
+    const quickBar = document.getElementById('quick');
+    const doctorList = document.getElementById('doctors');
+    const suggestionsEl = document.getElementById('suggestions');
+    const typingEl = document.getElementById('typing');
+    let sessionId = localStorage.getItem('session_id') || '';
+
+    const addBubble = (text, role='bot') => {
+      const div = document.createElement('div');
+      div.className = `bubble ${role}`;
+      div.textContent = text;
+      chatEl.appendChild(div);
+      chatEl.scrollTop = chatEl.scrollHeight;
+    };
+
+    const renderSuggestions = (suggestions = []) => {
+      suggestionsEl.textContent = '';
+      if(!suggestions.length) return;
+
+      const row = document.createElement('div');
+      row.className = 'suggestion-row';
+
+      suggestions.forEach((suggestion) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'suggestion-chip';
+        button.textContent = suggestion;
+        button.addEventListener('click', () => sendMessage(suggestion));
+        row.appendChild(button);
+      });
+
+      chatEl.appendChild(row);
+      chatEl.scrollTop = chatEl.scrollHeight;
+    };
+
+    const setTyping = (state) => {
+      typingEl.hidden = !state;
+    };
+
+    const fetchDoctors = async () => {
+      try {
+        const res = await fetch('/api/doctors');
+        if(!res.ok) throw new Error('Doctors fetch failed');
+        const data = await res.json();
+        doctorList.innerHTML = data.map(d => `
+          <li>
+            <span class="label">${d.name}</span>
+            <span class="sub">${d.department}</span>
+          </li>`).join('');
+      } catch (err) {
+        doctorList.innerHTML = '<li><span class="sub">Unable to load doctors.</span></li>';
+      }
+    };
+
+    const sendMessage = async (message) => {
+      addBubble(message, 'user');
+      input.value = '';
+      setTyping(true);
+      try {
+        const res = await fetch('/api/chat', {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({message, session_id: sessionId})
+        });
+        const data = await res.json();
+        sessionId = data.session_id;
+        localStorage.setItem('session_id', sessionId);
+        addBubble(data.reply, 'bot');
+        if(data.suggestions){
+          suggestionsEl.innerHTML = `<strong>Suggestions:</strong> ${data.suggestions.join(' | ')}`;
+        } else {
+          suggestionsEl.textContent = '';
+        }
+        renderSuggestions(data.suggestions || []);
+      } catch (err) {
+        addBubble('Something went wrong. Please try again.', 'bot');
+      } finally {
+        setTyping(false);
+      }
+    };
+
+    form.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const msg = input.value.trim();
+      if(msg) sendMessage(msg);
+    });
+
+    quickBar.addEventListener('click', (e)=>{
+      const pill = e.target.closest('.pill');
+      if(!pill) return;
+      sendMessage(pill.dataset.msg);
+    });
+
+    addBubble('Hi! I can book or cancel appointments. Tell me your symptoms and preferred date/time.');
+    fetchDoctors();
+  </script>
+</body>
+</html>
