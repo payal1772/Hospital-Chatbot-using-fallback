@@ -1,3 +1,4 @@
+
 # Hospital Chatbot
 
 Hospital Chatbot is a Flask-based patient support and appointment booking system. It combines a conversational interface with doctor availability, appointment management, symptom-to-department routing, and an AI fallback for general questions.
@@ -198,3 +199,7 @@ Example request:
 ## License
 
 Add your preferred license here.
+=======
+# Hospital-Chatbot-using-fallback
+Hospital Chatbot is an AI-powered appointment booking and patient support system built with Flask, SQLAlchemy, and MySQL/SQLite. It helps patients book or cancel doctor appointments, check doctor availability, route symptoms to the right department, and ask general health-related questions through a simple chat interface
+
